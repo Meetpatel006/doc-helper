@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 
-const Dropdown = ({ options, defaultValue, handleChange, name }) => {
+const Dropdown = ({ options, defaultValue, handleChange, name }: { options: any, defaultValue: any, handleChange: any, name: any }) => {
   const [value, setValue] = useState(defaultValue || "")
-  const onChange = (e) => {
+  const onChange = (e: any) => {
     setValue(e.target.value)
     handleChange(e)
   }
