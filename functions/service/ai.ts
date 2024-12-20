@@ -1,6 +1,6 @@
 import type { UIElement, AIResponse, Step } from '../types.js'
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || process.env.PLASMO_PUBLIC_GEMINI_API_KEY
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent'
 
 async function retryOperation<T>(
@@ -8,15 +8,19 @@ async function retryOperation<T>(
   maxRetries: number = 3,
   delay: number = 1000
 ): Promise<T> {
-  let lastError: Error
+  let lastError: Error = new Error('Operation failed')
   
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await operation()
-    } catch (error) {
-      lastError = error as Error
-      if (error.message.includes('429') || error.message.includes('quota')) {
-        throw error // Don't retry rate limit errors
+    } catch (error: unknown) {
+      if (!(error instanceof Error)) {
+        lastError = new Error('Unknown error occurred')
+      } else {
+        lastError = error
+        if (error.message.includes('429') || error.message.includes('quota')) {
+          throw error // Don't retry rate limit errors
+        }
       }
       if (i < maxRetries - 1) {
         await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)))
@@ -32,11 +36,11 @@ export const getAIResponse = async (
   docContent: UIElement[],
   question: string
 ): Promise<AIResponse> => {
-  if (!GEMINI_API_KEY) {
-    console.error('Gemini API key not found in environment variables')
+  if (!GEMINI_API_KEY || GEMINI_API_KEY === 'your_gemini_api_key_here' || GEMINI_API_KEY === 'your_api_key_here') {
+    console.error('Valid Gemini API key not found in environment variables')
     return {
       success: false,
-      error: 'Gemini API key is not configured',
+      error: 'Please configure a valid Gemini API key in your environment variables',
       steps: []
     }
   }
