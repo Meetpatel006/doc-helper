@@ -4,7 +4,12 @@ import BackIcon from "./BackIcon";
 import SettingLabel from "./SettingLabel";
 import { Paintbrush, Download, User, MessageSquare, Trash2, LogOut } from "lucide-react";
 
-const SettingDrawer = ({ close, setClose }) => {
+interface SettingDrawerProps {
+  close: boolean;
+  setClose: (value: boolean) => void;
+}
+
+const SettingDrawer = ({ close, setClose }: SettingDrawerProps) => {
   // Storage hooks
   const [themeMode, setThemeMode] = useStorage<string>("themeMode", "light");
   const [savedGuides, setSavedGuides] = useStorage<any[]>("savedGuides", []);
@@ -54,7 +59,7 @@ const SettingDrawer = ({ close, setClose }) => {
           system: "System Default"
         },
         defaultValue: themeMode,
-        handleChange: (e) => setThemeMode(e.target.value)
+        handleChange: (e: any) => setThemeMode(e.target.value)
       }
     },
     {
